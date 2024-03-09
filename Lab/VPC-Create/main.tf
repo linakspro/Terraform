@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "your-preferred-region"
+  region = "ap-south-1"
 }
 
 resource "aws_vpc" "example_vpc" {
@@ -15,7 +15,7 @@ resource "aws_vpc" "example_vpc" {
 resource "aws_subnet" "example_subnet" {
   vpc_id     = aws_vpc.example_vpc.id
   cidr_block = "10.0.1.0/24"
-  availability_zone = "your-preferred-availability-zone"
+  availability_zone = "ap-south-1a"
 
   tags = {
     Name = "example-subnet"
@@ -51,9 +51,9 @@ resource "aws_security_group" "example_security_group" {
 }
 
 resource "aws_instance" "example_instance" {
-  ami           = "ami-xxxxxxxxxxxxxxxxx"
+  ami           = "ami-0ba259e664698cbfc"
   instance_type = "t2.micro"
-  key_name      = "your-key-pair-name"
+  key_name      = "eksuser"
   subnet_id     = aws_subnet.example_subnet.id
   security_group_ids = [aws_security_group.example_security_group.id]
 

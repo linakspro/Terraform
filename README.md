@@ -1,2 +1,0 @@
-# Terraform
-Terraform Deployment Files

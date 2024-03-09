@@ -5,3 +5,4 @@ git config --global user.email johndoe@example.com
 git config --global user.name "linakspro"
 git config --global user.email linaksproe@example.com
 git config --list --show-origin
+git config --list

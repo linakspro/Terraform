@@ -1,17 +1,27 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "2.64.0"
+    }
+  }
+}
+
+# Configure the Azure provider
 provider "azurerm" {
   features {}
-
-  client_id       = var.client_id
-  client_secret   = var.client_secret
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
+#  subscription_id = "e23bd767-459d-44e8-a3c5-5c8721a87b6c"
 }
 
+data "azurerm_client_config" "current" {}
+
+# Create a resource group
 resource "azurerm_resource_group" "rg" {
   name     = "terraform-vm-rg"
-  location = "East US"
+  location = "South India"
 }
 
+# Create a virtual network
 resource "azurerm_virtual_network" "vnet" {
   name                = "terraform-vnet"
   address_space       = ["10.0.0.0/16"]
@@ -19,6 +29,7 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = azurerm_resource_group.rg.name
 }
 
+# Create a subnet
 resource "azurerm_subnet" "subnet" {
   name                 = "terraform-subnet"
   resource_group_name  = azurerm_resource_group.rg.name
@@ -26,6 +37,7 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
+# Create a public IP
 resource "azurerm_public_ip" "public_ip" {
   name                = "terraform-public-ip"
   resource_group_name = azurerm_resource_group.rg.name
@@ -33,6 +45,7 @@ resource "azurerm_public_ip" "public_ip" {
   allocation_method   = "Dynamic"
 }
 
+# Create a network interface
 resource "azurerm_network_interface" "nic" {
   name                = "terraform-nic"
   location            = azurerm_resource_group.rg.location
@@ -46,18 +59,19 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
+# Create a virtual machine
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = "terraform-vm"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  size                = "Standard_B1s"
+  size                = "Standard_B1s" # VM size
 
   network_interface_ids = [
     azurerm_network_interface.nic.id,
   ]
 
   admin_username = "adminuser"
-  admin_password = "P@ssw0rd1234!"  # Change to a secure password
+  admin_password = "P@ssw0rd1234!" # Change this to a secure password
 
   os_disk {
     caching              = "ReadWrite"
@@ -71,9 +85,11 @@ resource "azurerm_linux_virtual_machine" "vm" {
     version   = "latest"
   }
 
-  computer_name = "terraform-vm"
+  computer_name  = "terraform-vm"
+  disable_password_authentication = false
 }
 
+# Output the public IP of the VM
 output "public_ip_address" {
   value = azurerm_public_ip.public_ip.ip_address
 }

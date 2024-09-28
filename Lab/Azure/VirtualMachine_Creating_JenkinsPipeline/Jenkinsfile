@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+
+    environment {
+        ARM_SUBSCRIPTION_ID  = credentials('e23bd767-459d-44e8-a3c5-5c8721a87b6c')  // Azure Subscription ID (Jenkins Credential ID)
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the Terraform configuration from the repository
+                git url: 'https://github.com/linakspro/Terraform.git', branch: 'main'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                // Initialize Terraform
+                sh '''
+                    terraform init
+                '''
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                // Generate Terraform execution plan
+                sh '''
+                    terraform plan -out=tfplan
+                '''
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                // Apply the Terraform plan to create Azure VM
+                sh '''
+                    terraform apply -auto-approve tfplan
+                '''
+            }
+        }
+
+        stage('Output Public IP') {
+            steps {
+                // Output the public IP address of the Azure VM (if available in the configuration)
+                sh '''
+                    terraform output public_ip_address
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up workspace after the pipeline is finished
+            cleanWs()
+        }
+        success {
+            echo 'Terraform apply completed successfully!'
+        }
+        failure {
+            echo 'Terraform apply failed.'
+        }
+    }
+}

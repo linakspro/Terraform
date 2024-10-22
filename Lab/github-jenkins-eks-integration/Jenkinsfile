@@ -1,0 +1,46 @@
+pipeline {
+  agent any
+
+  environment {
+    AWS_ACCESS_KEY_ID     = credentials('AKIAQYEI5F7YA2UTZM53')
+    AWS_SECRET_ACCESS_KEY = credentials('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')
+    REGION                = 'ap-south-1'
+    EKS_CLUSTER_NAME      = 'my-cluster'
+  }
+
+  stages {
+    stage('Checkout Code') {
+      steps {
+        git 'https://github.com/linakspro/Terraform.git'
+      }
+    }
+
+    stage('Create EKS Cluster') {
+      steps {
+        script {
+          sh 'terraform init'
+          sh 'terraform apply -auto-approve'
+        }
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        script {
+          sh 'docker build -t my-app:latest .'
+          sh 'aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com'
+          sh 'docker tag my-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/my-app:latest'
+          sh 'docker push $AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/my-app:latest'
+        }
+      }
+    }
+
+    stage('Deploy to EKS') {
+      steps {
+        script {
+          sh 'kubectl apply -f kubernetes-deployment.yaml'
+        }
+      }
+    }
+  }
+}

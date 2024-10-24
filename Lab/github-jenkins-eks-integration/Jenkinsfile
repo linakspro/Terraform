@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    AWS_ACCESS_KEY_ID     = credentials('AKIAQYEI5F7YA2UTZM53')
+    AWS_ACCESS_KEY_ID     = credentials('AKIAUJ3VUIEICGT4S4CZ')
     AWS_SECRET_ACCESS_KEY = credentials('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')
     REGION                = 'ap-south-1'
     EKS_CLUSTER_NAME      = 'my-cluster'

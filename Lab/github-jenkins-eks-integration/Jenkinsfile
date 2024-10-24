@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     AWS_ACCESS_KEY_ID     = credentials('AKIAUJ3VUIEICGT4S4CZ')
-    AWS_SECRET_ACCESS_KEY = credentials('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')
+    AWS_SECRET_ACCESS_KEY = credentials('Oz+L29U0k9odtMUOsio9M7sWAH2o/elgVV2YUs3N')
     REGION                = 'ap-south-1'
     EKS_CLUSTER_NAME      = 'my-cluster'
   }
